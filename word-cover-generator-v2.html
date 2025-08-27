@@ -252,6 +252,8 @@
             max-height: 100%;
             object-fit: contain;
             border-radius: 50%;
+            width: 100%;
+            height: 100%;
         }
 
         .subject-name {
@@ -1395,6 +1397,7 @@
                 <div class="form-group">
                     <label for="logoInput">Logo trường (tùy chọn):</label>
                     <input type="file" id="logoInput" accept="image/*">
+                    <button type="button" id="resetLogo" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer;">🔄 Dùng logo NEU mặc định</button>
                 </div>
                 
                 <div class="form-group">
@@ -1522,7 +1525,7 @@
                         <div class="content-frame">
                         <div class="header-section">
                             <div class="university-name" id="previewUniversity">ĐẠI HỌC KINH TẾ QUỐC DÂN</div>
-                            <div class="logo-placeholder" id="logoBox">NEU</div>
+                            <div class="logo-placeholder" id="logoBox"><img id="defaultLogo" src="logo-neu-inkythuatso-01-09-10-41-01 (1).jpg" alt="NEU Logo"></div>
                             <div class="subject-name" id="previewSubject">ĐỒ ÁN TỐT NGHIỆP</div>
                             <div class="header-accent accent-6" id="headerAccent"></div>
                         </div>
@@ -1636,6 +1639,8 @@
         // Logo upload handling
         let logoDataUrl = '';
         const logoInput = document.getElementById('logoInput');
+        const resetLogoBtn = document.getElementById('resetLogo');
+        
         if (logoInput) {
             logoInput.addEventListener('change', (e) => {
                 const file = e.target.files && e.target.files[0];
@@ -1648,6 +1653,14 @@
                 reader.readAsDataURL(file);
             });
         }
+        
+        if (resetLogoBtn) {
+            resetLogoBtn.addEventListener('click', () => {
+                logoDataUrl = '';
+                logoInput.value = '';
+                updateLogoPreview();
+            });
+        }
 
         function updateLogoPreview() {
             const logoBox = document.getElementById('logoBox');
@@ -1657,7 +1670,8 @@
                 const img = document.getElementById('previewLogo');
                 img.src = logoDataUrl;
             } else {
-                logoBox.textContent = 'NEU';
+                // Trở về logo NEU mặc định
+                logoBox.innerHTML = '<img id="defaultLogo" src="logo-neu-inkythuatso-01-09-10-41-01 (1).jpg" alt="NEU Logo">';
             }
         }
 
@@ -1958,6 +1972,20 @@
                     clonedPreview.appendChild(footerAccent);
                 }
                 
+                // Đảm bảo logo hiển thị đúng trong ảnh
+                const logoBox = clonedPreview.querySelector('#logoBox');
+                if (logoBox) {
+                    if (logoDataUrl) {
+                        // Nếu có logo tùy chọn
+                        logoBox.innerHTML = '<img id="previewLogo" alt="logo" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 50%; width: 100%; height: 100%;">';
+                        const img = logoBox.querySelector('#previewLogo');
+                        if (img) img.src = logoDataUrl;
+                    } else {
+                        // Nếu dùng logo mặc định
+                        logoBox.innerHTML = '<img id="defaultLogo" src="logo-neu-inkythuatso-01-09-10-41-01 (1).jpg" alt="NEU Logo" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 50%; width: 100%; height: 100%;">';
+                    }
+                }
+                
                 // Thêm CSS để đảm bảo hiển thị đúng trong ảnh
                 const style = document.createElement('style');
                 style.textContent = `
@@ -1981,6 +2009,14 @@
                         position: relative !important; 
                         z-index: 10 !important; 
                         background: #fff !important;
+                    }
+                    .logo-placeholder img {
+                        max-width: 100% !important;
+                        max-height: 100% !important;
+                        object-fit: contain !important;
+                        border-radius: 50% !important;
+                        width: 100% !important;
+                        height: 100% !important;
                     }
                 `;
                 clonedPreview.appendChild(style);
